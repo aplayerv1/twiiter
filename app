@@ -1,0 +1,87 @@
+echo 'apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+  creationTimestamp: null
+
+  labels:
+
+    app: demo
+
+  name: demo
+
+spec:
+
+  replicas: 1
+
+  selector:
+
+    matchLabels:
+
+      app: demo
+
+  strategy: {}
+
+  template:
+
+    metadata:
+
+      creationTimestamp: null
+
+      labels:
+
+        app: demo
+
+    spec:
+
+      containers:
+
+      - image: cst8277/twiiter:local
+
+        name: demo-app
+
+        resources: {}
+
+status: {}
+
+---
+
+apiVersion: v1
+
+kind: Service
+
+metadata:
+
+  creationTimestamp: null
+
+  labels:
+
+    app: demo
+
+  name: demo
+
+spec:
+
+  ports:
+
+  - name: 8080-8080
+
+    port: 8080
+
+    protocol: TCP
+
+    targetPort: 8080
+
+  selector:
+
+    app: demo
+
+  type: NodePort
+
+status:
+
+  loadBalancer: {}
+
+' > demo-app.yaml
