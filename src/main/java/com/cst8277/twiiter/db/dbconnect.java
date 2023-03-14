@@ -23,7 +23,6 @@ public class dbconnect {
         } catch (ClassNotFoundException e) {
             System.out.println("Where is your MySQL JDBC Driver?");
             e.printStackTrace();
-
         }
 
         catch (SQLException e) {

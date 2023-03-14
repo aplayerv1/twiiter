@@ -10,16 +10,22 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 public class UserManagementService {
-//    @GetMapping(path="/")
-//    public Greeting getMainPage(@RequestParam(value = "name",defaultValue = "World") String name) {
-//    return new Greeting(counter.incrementAndGet(), String.format(template, name));
-//
-//}
+
     Connection con = dbconnect.getConnectionToDatabase();
     String _x = "apjdc";
-    public Boolean checkauth(String name,String uuid){
+    public Boolean checkauth(String name,String uuid) throws SQLException {
+        String sql = "select * from Session where name=? and uuid=?";
+        PreparedStatement prst = con.prepareStatement(sql);
 
-        return UUID.fromString(name+uuid).toString()==uuid;
+        prst.setString(1,name);
+        prst.setString(2,uuid);
+        ResultSet set = prst.executeQuery();
+
+        while (set.next()){
+            return true;
+        }
+
+        return false;
     }
     public UUID validate(String username, String password) throws SQLException {
 
@@ -28,14 +34,28 @@ public class UserManagementService {
 
         prst.setString(1,username);
         prst.setString(2,password);
+        System.out.println(prst);
         ResultSet set = prst.executeQuery();
 
         while (set.next()){
-            return UUID.fromString(set.getString("user")+_x);
+            UUID uid = UUID.randomUUID();
+            String sqla = "insert into Session(name,uuid) values (?,?)";
+            PreparedStatement prep = con.prepareStatement(sqla);
+            prep.setString(1,username);
+            prep.setString(2,uid.toString());
+            prep.executeUpdate();
+
+            return uid;
         }
+
         return null;
     }
 
-
+    public void removesession(String name) throws SQLException{
+        String sqla = "delete from Session where name=?";
+        PreparedStatement prep = con.prepareStatement(sqla);
+        prep.setString(1,name);
+        prep.executeUpdate();
+    }
 
 }

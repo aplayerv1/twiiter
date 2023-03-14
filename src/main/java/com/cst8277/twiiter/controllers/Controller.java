@@ -20,7 +20,7 @@ public class Controller {
     UserManagementService usmg = new UserManagementService();
 
     @GetMapping(path = "/")
-    public ResponseEntity<Greeting> getMainPage(@RequestParam("uuid") String uuid, @RequestParam(value = "name", defaultValue = "World") String name) {
+    public ResponseEntity<Greeting> getMainPage(@RequestParam("uuid") String uuid, @RequestParam(value = "name", defaultValue = "World") String name) throws SQLException {
         if (!usmg.checkauth(name,uuid)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
@@ -31,7 +31,8 @@ public class Controller {
     @GetMapping(path = "/login")
     public ResponseEntity<UUID> Login(@RequestParam("name") String name, @RequestParam("password") String password) throws SQLException {
       UUID uuid = usmg.validate(name,password);
-      return ResponseEntity.status(HttpStatus.OK).body(uuid);
+
+      return ResponseEntity.status(uuid!=null ? HttpStatus.OK:HttpStatus.UNAUTHORIZED).body(uuid);
 
     }
 }
