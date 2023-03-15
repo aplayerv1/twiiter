@@ -16,27 +16,35 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 
-public class Controller {
+public class UserController {
     private static final String template = "hello world, %s!";
     private final AtomicLong counter = new AtomicLong();
     UserManagementService usmg = new UserManagementService();
 
     @GetMapping(path = "/")
     public ResponseEntity<Greeting> getMainPage(@RequestParam("uuid") String uuid, @RequestParam(value = "name", defaultValue = "World") String name) throws SQLException {
-        if (!usmg.checkauth(name,uuid)) {
+        if (!usmg.verifyToken(name, uuid)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        return ResponseEntity.status(HttpStatus.OK).body(new Greeting(counter.incrementAndGet(), String.format(template, name))) ;
+        return ResponseEntity.status(HttpStatus.OK).body(new Greeting(counter.incrementAndGet(), String.format(template, name)));
 
+
+    }
+    @GetMapping(path = "/users")
+    public ResponseEntity<Map<String, Object>> User(@RequestParam("name") String name, @RequestParam("uuid") String uuid) throws SQLException {
+
+        HashMap<String, Object> map = usmg.getUsers(name,uuid);
+
+        return ResponseEntity.status(uuid != null ? HttpStatus.OK : HttpStatus.UNAUTHORIZED).body(map);
 
     }
     @GetMapping(path = "/login")
     public ResponseEntity<Map<String, Object>> Login(@RequestParam("name") String name, @RequestParam("password") String password) throws SQLException {
-      UUID uuid = usmg.validate(name,password);
+        String uuid = usmg.login(name, password);
         HashMap<String, Object> map = new HashMap<>();
-        map.put("uuid",uuid);
+        map.put("uuid", uuid);
 
-      return ResponseEntity.status(uuid!=null ? HttpStatus.OK:HttpStatus.UNAUTHORIZED).body(map);
+        return ResponseEntity.status(uuid != null ? HttpStatus.OK : HttpStatus.UNAUTHORIZED).body(map);
 
     }
 }
