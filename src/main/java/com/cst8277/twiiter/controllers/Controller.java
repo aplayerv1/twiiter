@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -29,10 +31,12 @@ public class Controller {
 
     }
     @GetMapping(path = "/login")
-    public ResponseEntity<UUID> Login(@RequestParam("name") String name, @RequestParam("password") String password) throws SQLException {
+    public ResponseEntity<Map<String, Object>> Login(@RequestParam("name") String name, @RequestParam("password") String password) throws SQLException {
       UUID uuid = usmg.validate(name,password);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("uuid",uuid);
 
-      return ResponseEntity.status(uuid!=null ? HttpStatus.OK:HttpStatus.UNAUTHORIZED).body(uuid);
+      return ResponseEntity.status(uuid!=null ? HttpStatus.OK:HttpStatus.UNAUTHORIZED).body(map);
 
     }
 }

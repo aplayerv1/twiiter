@@ -38,6 +38,7 @@ public class UserManagementService {
         ResultSet set = prst.executeQuery();
 
         while (set.next()){
+            removesession(username);
             UUID uid = UUID.randomUUID();
             String sqla = "insert into Session(name,uuid) values (?,?)";
             PreparedStatement prep = con.prepareStatement(sqla);
@@ -52,10 +53,15 @@ public class UserManagementService {
     }
 
     public void removesession(String name) throws SQLException{
-        String sqla = "delete from Session where name=?";
-        PreparedStatement prep = con.prepareStatement(sqla);
+        String sqlr = "delete from Session where name=?";
+        PreparedStatement prep = con.prepareStatement(sqlr);
         prep.setString(1,name);
         prep.executeUpdate();
+    }
+
+    public UUID generateToken(){
+
+        return UUID.randomUUID();
     }
 
 }
