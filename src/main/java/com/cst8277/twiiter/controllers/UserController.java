@@ -38,6 +38,17 @@ public class UserController {
         return ResponseEntity.status(uuid != null ? HttpStatus.OK : HttpStatus.UNAUTHORIZED).body(map);
 
     }
+    @GetMapping(path = "/subscriber")
+    public ResponseEntity<Map<String, Object>> Subscriber(@RequestParam("name") String name, @RequestParam("uuid") String uuid) throws SQLException {
+        HashMap<String, Object> map = usmg.getSubs(name,uuid);
+        return ResponseEntity.status(uuid != null ? HttpStatus.OK : HttpStatus.UNAUTHORIZED).body(map);
+
+    }
+    @GetMapping(path = "/addUser")
+    public ResponseEntity<Map<String, Object>> addUser(@RequestParam("name") String name, @RequestParam("uuid") String uuid,@RequestParam("username")String username,@RequestParam("password") String password) throws SQLException{
+        HashMap<String,Object> map = usmg.addUser(name,uuid,username,password);
+        return ResponseEntity.status(uuid != null ?HttpStatus.OK : HttpStatus.UNAUTHORIZED).body(map);
+    }
     @GetMapping(path = "/login")
     public ResponseEntity<Map<String, Object>> Login(@RequestParam("name") String name, @RequestParam("password") String password) throws SQLException {
         String uuid = usmg.login(name, password);

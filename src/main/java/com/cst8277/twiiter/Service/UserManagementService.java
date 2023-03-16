@@ -89,5 +89,39 @@ public class UserManagementService {
         }
         return null;
     }
+    public HashMap<String, Object> getSubs(String name, String uuid) throws SQLException{
+        if(verifyToken(name,uuid)){
+            HashMap<String, Object> hm = new HashMap<>();
+            String sql = "SELECT Registry.id, role.id, Registry.`user` FROM Registry INNER JOIN role ON Registry.id = role.id";
+            PreparedStatement prst = con.prepareStatement(sql);
+            ResultSet set = prst.executeQuery();
+            int count = 0;
+            while(set.next()){
+                HashMap<String,Object> um = new HashMap<>();
+                for(int i=0;i<set.getMetaData().getColumnCount();i++){
+                    um.put(set.getMetaData().getColumnName(i+1), set.getObject(i+1));
+
+                }
+                hm.put(Integer.toString(count),um);
+                count++;
+            }
+        return hm;
+
+        }
+        return null;
+    }
+
+    public HashMap<String, Object> addUser(String name, String uuid,String username,String password) throws SQLException{
+        if(verifyToken(name,uuid)){
+            HashMap<String, Object> hm = new HashMap<>();
+            String sql = "INSERT INTO Registry (`USER`,`password`,isSubscriber,isProducer) VALUES (?,?,0,0)";
+            PreparedStatement prst = con.prepareStatement(sql);
+            prst.setString(1, username);
+            prst.setString(2, password);
+            prst.executeUpdate();
+        }
+        return null;
+    }
+
 
 }
