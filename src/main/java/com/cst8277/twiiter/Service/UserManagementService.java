@@ -123,5 +123,48 @@ public class UserManagementService {
         return null;
     }
 
+    public HashMap<String, Object> getMsg (String name, String uuid, String username) throws SQLException{
+        if(verifyToken(name,uuid)){
+            if(username==""){
+                HashMap<String,Object> hm = new HashMap<>();
+                String sql = "SELECT Messages FROM Messaging";
+                PreparedStatement prst = con.prepareStatement(sql);
+                ResultSet set = prst.executeQuery();
+                int count = 0;
+                while(set.next()){
+                    HashMap<String,Object> um = new HashMap<>();
+                    for(int i=0;i<set.getMetaData().getColumnCount();i++){
+                        um.put(set.getMetaData().getColumnName(i+1), set.getObject(i+1));
+
+                    }
+                    hm.put(Integer.toString(count),um);
+                    count++;
+                }
+                return hm;
+            }else{
+                HashMap<String, Object> hm = new HashMap<>();
+                String sql = "SELECT Messages, Registry.`user` FROM Messaging INNER JOIN Registry ON Messaging.Registry_id = Registry.id WHERE Registry.`user`=?";
+                PreparedStatement prst = con.prepareStatement(sql);
+                prst.setString(1,username);
+                ResultSet set =  prst.executeQuery();
+                int count = 0;
+                while(set.next()){
+                    HashMap<String,Object> um = new HashMap<>();
+                    for(int i=0;i<set.getMetaData().getColumnCount();i++){
+                        um.put(set.getMetaData().getColumnName(i+1), set.getObject(i+1));
+
+                    }
+                    hm.put(Integer.toString(count),um);
+                    count++;
+                }
+                return hm;
+
+            }
+
+        }
+
+        return null;
+    }
+
 
 }

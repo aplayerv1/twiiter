@@ -58,4 +58,10 @@ public class UserController {
         return ResponseEntity.status(uuid != null ? HttpStatus.OK : HttpStatus.UNAUTHORIZED).body(map);
 
     }
+    @GetMapping(path = "/getMsg")
+    public ResponseEntity<Map<String,Object>> getMsg(@RequestParam("name") String name, @RequestParam("uuid")String uuid,@RequestParam("username")String username) throws SQLException{
+        HashMap<String, Object> map = usmg.getMsg(name,uuid,username);
+        return ResponseEntity.status(uuid != null ? HttpStatus.OK : HttpStatus.UNAUTHORIZED).body(map);
+
+    }
 }
