@@ -17,7 +17,7 @@ public class dbconnect {
 
             // get hold of the DriverManager
             connection = DriverManager.getConnection(
-                    "jdbc:mysql://10.10.1.3:3306/mydb?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
+                    "jdbc:mysql://188.82.216.185:28633/mydb?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
                     "root", "root");
 
         } catch (ClassNotFoundException e) {
