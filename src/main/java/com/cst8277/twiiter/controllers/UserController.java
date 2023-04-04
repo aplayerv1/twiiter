@@ -2,6 +2,7 @@ package com.cst8277.twiiter.controllers;
 
 import com.cst8277.twiiter.Service.UserManagementService;
 import com.cst8277.twiiter.dto.Greeting;
+import com.cst8277.twiiter.security.Security;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +30,7 @@ public class UserController {
     private static final String template = "hello world, %s!";
     private final AtomicLong counter = new AtomicLong();
     UserManagementService usmg = new UserManagementService();
-
+    Security s = new Security();
     @GetMapping(path = "/")
     public ResponseEntity<Greeting> getMainPage(@RequestParam("uuid") String uuid, @RequestParam(value = "name", defaultValue = "World") String name) throws SQLException {
         if (!usmg.verifyToken(name, uuid)) {
@@ -73,21 +74,12 @@ public class UserController {
     }
 
     @GetMapping("/user")
-    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
-        System.out.println(principal.getName());
-        return Collections.singletonMap("name", principal.getAttribute("name"));
+    public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) throws SQLException {
+        System.out.println(principal.getAttributes());
+
+        s.checkUUID((String)principal.getAttribute("login"));
+
+        return Collections.singletonMap("name", principal.getAttribute("login"));
     }
 
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        http
-//                .authorizeRequests(a -> a
-//                        .requestMatchers("/","/error","/webjars/**").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                .exceptionHandling(e -> e
-//                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-//                .oauth2Login();
-//        return http.build();
-//    }
 }
