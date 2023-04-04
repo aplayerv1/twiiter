@@ -3,10 +3,10 @@ package com.cst8277.twiiter.controllers;
 import com.cst8277.twiiter.Service.UserManagementService;
 import com.cst8277.twiiter.dto.Greeting;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -54,10 +54,9 @@ public class UserController {
         String uuid = usmg.login(name, password);
         HashMap<String, Object> map = new HashMap<>();
         map.put("uuid", uuid);
-
         return ResponseEntity.status(uuid != null ? HttpStatus.OK : HttpStatus.UNAUTHORIZED).body(map);
-
     }
+
     @GetMapping(path = "/getMsg")
     public ResponseEntity<Map<String,Object>> getMsg(@RequestParam("name") String name, @RequestParam("uuid")String uuid,@RequestParam("username")String username) throws SQLException{
         HashMap<String, Object> map = usmg.getMsg(name,uuid,username);
