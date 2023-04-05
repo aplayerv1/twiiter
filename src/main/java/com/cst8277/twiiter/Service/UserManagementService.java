@@ -5,6 +5,7 @@ import com.cst8277.twiiter.db.dbconnect;
 import com.cst8277.twiiter.security.Security;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
+import javax.xml.transform.Result;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,7 +20,7 @@ public class UserManagementService {
     Security s = new Security();
 
     public Boolean verifyToken(String name, String uuid) throws SQLException {
-        String sql = "select * from Session where name=? and uuid=?";
+        String sql = "select * from Session where Session.name=? and uuid=?";
         PreparedStatement prst = con.prepareStatement(sql);
 
         prst.setString(1, name);
@@ -194,6 +195,17 @@ public class UserManagementService {
             prepd.executeUpdate();
             return uuid;
         }
+    }
+
+    public String getToken(String name) throws SQLException {
+        String sqlea = "select uuid from Session where Session.name=?";
+        PreparedStatement ppp = con.prepareStatement(sqlea);
+        ppp.setString(1,name);
+        ResultSet getset = ppp.executeQuery();
+        while(getset.next()){
+            return (String) getset.getObject(1);
+        }
+        return null;
     }
 
 }

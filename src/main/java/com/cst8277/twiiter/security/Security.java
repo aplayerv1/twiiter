@@ -8,6 +8,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.cst8277.twiiter.Service.UserManagementService;
 import com.nimbusds.jwt.proc.JWTClaimsSetVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -27,6 +28,8 @@ import java.util.Date;
 @Configuration
 @EnableWebSecurity
 public class Security {
+    @Value("${config.secret}")
+    private String secret;
     @Bean
     @Autowired
     SecurityFilterChain getSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -36,7 +39,7 @@ public class Security {
         httpSecurity.authorizeHttpRequests().anyRequest().authenticated();
 
         httpSecurity.oauth2Login()
-                .defaultSuccessUrl("/user", true);
+                .defaultSuccessUrl("/", true);
         return httpSecurity.build();
 
     }
@@ -57,6 +60,7 @@ public class Security {
         UserManagementService usmg = new UserManagementService();
         String uuid = String.valueOf(usmg.generateToken());
         String s = JWT.create().withClaim(name,uuid).withExpiresAt(new Date(System.currentTimeMillis()+900000)).sign(Algorithm.HMAC512("s"));
+        System.out.println(secret);
         UserManagementService usms = new UserManagementService();
         usms.verifyToken(name,s);
         return s;
@@ -66,5 +70,18 @@ public class Security {
         return expiresAt.before(new Date());
     }
 
+    public String getToken(String name) throws SQLException {
+        UserManagementService usmg = new UserManagementService();
+        String token = usmg.getToken(name);
+        if (token !=  null) {
+            Boolean verify = (isJWTExpired(JWT.decode(token)));
+            if(verify == false) {
+                return token;
+            }
+            return null;
+        }else {
+            return jwtEncode(name);
+        }
+    }
 
 }
