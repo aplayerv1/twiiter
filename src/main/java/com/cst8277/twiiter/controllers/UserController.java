@@ -1,5 +1,7 @@
 package com.cst8277.twiiter.controllers;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.cst8277.twiiter.Service.UserManagementService;
 import com.cst8277.twiiter.dto.Greeting;
 import com.cst8277.twiiter.security.Security;
@@ -11,14 +13,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.web.context.request.RequestContextHolder;
+
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -30,6 +36,8 @@ public class UserController {
     private static final String template = "hello world, %s!";
     private final AtomicLong counter = new AtomicLong();
     UserManagementService usmg = new UserManagementService();
+    Security j = new Security();
+
     Security s = new Security();
     @GetMapping(path = "/")
     public ResponseEntity<Greeting> getMainPage(@RequestParam("uuid") String uuid, @RequestParam(value = "name", defaultValue = "World") String name) throws SQLException {
@@ -75,9 +83,12 @@ public class UserController {
 
     @GetMapping("/user")
     public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) throws SQLException {
-        System.out.println(principal.getAttributes());
+        String g = j.jwtEncode(principal.getAttribute("login"));
 
-        s.checkUUID((String)principal.getAttribute("login"));
+        System.out.println(j.isJWTExpired(JWT.decode(g)));
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(principal.getAttribute("login"),usmg.generateSession(principal.getAttribute("login"),g));
 
         return Collections.singletonMap("name", principal.getAttribute("login"));
     }

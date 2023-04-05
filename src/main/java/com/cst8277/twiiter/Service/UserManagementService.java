@@ -1,20 +1,22 @@
 package com.cst8277.twiiter.Service;
 
+import com.auth0.jwt.JWT;
 import com.cst8277.twiiter.db.dbconnect;
-import com.mysql.cj.xdevapi.JsonArray;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.cst8277.twiiter.security.Security;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
+@EnableWebSecurity
 public class UserManagementService {
 
     Connection con = dbconnect.getConnectionToDatabase();
+    Security s = new Security();
 
     public Boolean verifyToken(String name, String uuid) throws SQLException {
         String sql = "select * from Session where name=? and uuid=?";
@@ -166,5 +168,32 @@ public class UserManagementService {
         return null;
     }
 
+    public String generateSession(String name, String uuid) throws SQLException {
+        String sqla = "select * from Session where Session.name=?";
+        PreparedStatement prep = con.prepareStatement(sqla);
+        prep.setString(1,name);
+        ResultSet set = prep.executeQuery();
+
+        if(set.next()){
+            String sqle = "select uuid from Session where Session.name=?";
+            PreparedStatement pp = con.prepareStatement(sqle);
+            pp.setString(1,name);
+            ResultSet sets = prep.executeQuery();
+            while(sets.next()){
+                if(s.isJWTExpired(JWT.decode((String) sets.getObject(2))) == true){
+                    removeSession(name);
+                }
+            }
+            return null;
+        }else{
+            System.out.println("meh");
+            String sqll = "insert into Session(name,uuid) values (?,?)";
+            PreparedStatement prepd = con.prepareStatement(sqll);
+            prepd.setString(1, name);
+            prepd.setString(2, uuid);
+            prepd.executeUpdate();
+            return uuid;
+        }
+    }
 
 }
